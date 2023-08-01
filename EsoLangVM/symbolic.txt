@@ -69,7 +69,7 @@ It would probably be a good idea to account for memory permanence.
 For example:
 
 ```
-mov	eax, [esi+edx*4]
+mov eax, [esi+edx*4]
 mov ebx, eax
 sub eax, [esi+edx*4]
 ```
