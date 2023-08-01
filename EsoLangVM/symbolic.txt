@@ -6,12 +6,12 @@ just to meet our needs for this one project.
 This solution is custom tailored to the executable that came with the challenge,
 and may or may not work with other ELVM-compiled programs.
 
-# Assumptiona and requirements
+# Assumptions and requirements
 
 Each macro receives some inputs stored in registers, including esi which is a pointer to a large int table that doesn't change.
 Among the inputs are indices used to reference into the table.
-Value are read from and written to the table, with some basic math sometimes performed in between.
-We want to boil each macro down to its changes to the table, and it's outputs (registers that are left changed on exit.)
+Values are read from and written to the table, with some basic math sometimes performed in between.
+We want to boil each macro down to its changes to the table, and its outputs (registers that are left changed on exit.)
 
 We want the table indexing to be relative to the inputs.
 If idx1 is passed into the macro via edi, and we then have:
@@ -52,18 +52,17 @@ After line 1, edx = { idx1 }
 After line 2, edx = { idx1, 1}
 idx1 is irreducible, so these can't be folded together.
 
-After line 3, eax = { mem({ idx1, 1}) }
+After line 3, eax = { esi[{ idx1, 1 }] }
 Since all memory reads and writes involve table offsets, these references can just be a special type of irreducible term.
 
-After line 4, edx = { idx1, 1, mem({ idx1, 1})}
-This cannot be further reduced
+After line 4, edx = { idx1, 1, esi[{ idx1, 1}]}
+This cannot be further reduced.
 
-After line 5, edx = { idx1, 1, mem({ idx1, 1}), 3}
-All the reducible terms can be combined here, leaving edx = { idx1, 4, mem({ idx1, 1}) }
+After line 5, edx = { idx1, 1, esi[{ idx1, 1}], 3}
+The reducible terms can be combined here, leaving edx = { idx1, 4, esi[{ idx1, 1}] }
 
 It's straightforward enough on paper.
-In practice each of these terms will have to be instances of some kind of object,
-that can be nested and continuously reduce themselves after updates (constant folding.)
+In practice we have to work out how to manage these data sets and continuously reduce them after each update (constant folding.)
 
 It would probably be a good idea to account for memory permanence.
 For example:
@@ -90,7 +89,7 @@ mov ecx, [esi+index*4]
 mov [esi+edi*4], ecx
 ```
 
-We need to be cognizant of which value from mem({ index }) is being written to mem( { edi } ) since it has different values at different times.
+We need to be cognizant of which value from esi[{index}] is being written to esi[{ edi }] since it has different values at different times.
 Since we're doing fairly localized folding, and are just trying to produce a new listing that's easier to follow,
 rather than producing some holistic execution map like we would need for something like constraint solving, we can probably not worry too much about this.
 As long as we print out memory reads and writes as we encounter them, it should be clear when stored values have changed in between operations.
@@ -107,7 +106,7 @@ The engine just operates on 48-bit values.
 This is equivalent to "sub edx, 1" and we can go through replacing pairs like this with the corresponding instructions.
 If we see a bare "and edx, 0FFFFFFh" instruction, we can probably safely ignore it and still produce accurate output.
 
-The whole thing is going to be pretty janky and inefficient, but the macros follow a simple enough pattern that it should be just doable.
+The whole thing is going to be pretty janky and inefficient, but the macros follow a simple enough pattern that it should be just about doable.
 
 # Results
 
@@ -146,7 +145,7 @@ LOAD:0010FC2D                 setnz   bl
 ```
 
 Not too bad.
-Compare it to the manual analysis in 688_manual.txt to see we get the same results.
+Compare it to the manual analysis in (688_manual.txt) to see we get the same results.
 
 We can easily start seeing some structure, like eg:
 ```
@@ -155,6 +154,10 @@ esi[param_2 - 1] = esi[param_2 - 1] + 1
 ```
 
 'esi[param_0 - 4]' gets assigned what appears to be a counter, then the counter gets incremented.
+Keep in mind that we're treating esi as a table stored as a uint32_t[], so esi[x] is actually at esi+x*4.
 
-I'v left the comparisons unprocessed at the end for now and built it just to help process the tedious table operations.
-We also know all of our registers passing values in and out, so we should be able to start stringing these together.
+I've left the comparisons unprocessed at the end for now since they each do something a bit different.
+The point of the script is to eliminate having to manually analyze the bulk read, write, math sections that make up each macro.
+
+We also know all of our registers passing values in and out, so we should be able to start stringing these together into something sensible.
+
