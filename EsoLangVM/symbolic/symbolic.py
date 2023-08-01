@@ -181,12 +181,12 @@ def print_listing(ins_list):
 
 # main
 
-#if len(sys.argv) != 2:
-#    print("symbolic.py file\n")
-#    exit()
+if len(sys.argv) != 2:
+    print("symbolic.py file\n")
+    exit()
 
 # Initial instruction loading
-with open("688.txt") as file:
+with open(sys.argv[1]) as file:
     processing = True
     
     for line in file:
