@@ -1,4 +1,5 @@
 4d5a9000's EsoLangVM Test
+
 https://crackmes.one/crackme/644d347733c5d43938912cd7
 
 # Challenge
@@ -185,7 +186,7 @@ with open("search.txt") as file:
             add_break(args[1], args[2])
 ```
 
-We can pipe the output to a file like (gdb.cmd)
+We can pipe the output to a file (gdb.cmd)
 
 We start up keygenme.elf, then switch to another shell and attach gdb.
 
