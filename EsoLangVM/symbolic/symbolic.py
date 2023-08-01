@@ -180,7 +180,6 @@ def print_listing(ins_list):
         print(line)
 
 # main
-
 if len(sys.argv) != 2:
     print("symbolic.py file\n")
     exit()
@@ -200,7 +199,6 @@ with open(sys.argv[1]) as file:
                 
         if not processing:
             unprocessed.append(line.strip())
-                
 
 peephole(ins_list)
 mark_inputs(ins_list, params)
