@@ -63,7 +63,7 @@ All the reducible terms can be combined here, leaving edx = { idx1, 4, mem({ idx
 
 It's straightforward enough on paper.
 In practice each of these terms will have to be instances of some kind of object,
-that can be nested and recursively reduce themselves after updates (constant folding.)
+that can be nested and continuously reduce themselves after updates (constant folding.)
 
 It would probably be a good idea to account for memory permanence.
 For example:
