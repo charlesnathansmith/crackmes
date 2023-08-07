@@ -1,0 +1,19 @@
+LOAD:00102363                 mov     ebx, ebp        ; jumptable 00101DFB case 27
+LOAD:00102365                 add     ebx, 0FFFFFFh
+LOAD:0010236B                 and     ebx, 0FFFFFFh
+LOAD:00102371                 mov     eax, [esi+ebx*4]
+LOAD:00102374                 mov     edx, edi
+LOAD:00102376                 add     edx, 0FFFFFFh
+LOAD:0010237C                 and     edx, 0FFFFFFh
+LOAD:00102382                 mov     [esi+edx*4], eax
+LOAD:00102385                 mov     edi, edx
+LOAD:00102387                 add     eax, 1
+LOAD:0010238D                 and     eax, 0FFFFFFh
+LOAD:00102393                 mov     ebx, ebp
+LOAD:00102395                 add     ebx, 0FFFFFFh
+LOAD:0010239B                 and     ebx, 0FFFFFFh
+LOAD:001023A1                 mov     [esi+ebx*4], eax
+LOAD:001023A4                 mov     eax, [esi+edi*4]
+LOAD:001023A7                 add     edi, 1
+LOAD:001023AD                 and     edi, 0FFFFFFh
+LOAD:001023B3                 jmp     loc_102042      ; jumptable 00101DFB case 22

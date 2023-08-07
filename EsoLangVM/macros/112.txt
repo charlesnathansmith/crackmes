@@ -1,0 +1,10 @@
+LOAD:00103CCD                 mov     ebx, ebp        ; jumptable 00101DFB case 112
+LOAD:00103CCF                 add     ebx, 0FFFFFCh
+LOAD:00103CD5                 and     ebx, 0FFFFFFh
+LOAD:00103CDB                 mov     [esi+ebx*4], eax
+LOAD:00103CDE                 mov     ebx, ebp
+LOAD:00103CE0                 add     ebx, 0FFFFFCh
+LOAD:00103CE6                 and     ebx, 0FFFFFFh
+LOAD:00103CEC                 mov     eax, [esi+ebx*4]
+LOAD:00103CEF                 cmp     eax, 0
+LOAD:00103CF5                 jnz     short loc_103CFC ; jumptable 00101DFB case 113

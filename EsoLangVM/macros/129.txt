@@ -1,0 +1,6 @@
+LOAD:001042AE                 mov     edx, edi        ; jumptable 00101DFB case 129
+LOAD:001042B0                 add     edx, 0FFFFFFh
+LOAD:001042B6                 and     edx, 0FFFFFFh
+LOAD:001042BC                 mov     [esi+edx*4], ebp
+LOAD:001042BF                 mov     edi, edx
+LOAD:001042C1                 mov     ebp, edi

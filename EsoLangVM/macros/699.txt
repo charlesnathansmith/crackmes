@@ -1,0 +1,21 @@
+LOAD:0010FFA6                 mov     eax, ebx        ; jumptable 00101DFB case 699
+LOAD:0010FFA8                 add     edi, 2
+LOAD:0010FFAE                 and     edi, 0FFFFFFh
+LOAD:0010FFB4                 mov     edx, edi
+LOAD:0010FFB6                 add     edx, 0FFFFFFh
+LOAD:0010FFBC                 and     edx, 0FFFFFFh
+LOAD:0010FFC2                 mov     [esi+edx*4], eax
+LOAD:0010FFC5                 mov     edi, edx
+LOAD:0010FFC7                 mov     ebx, ebp
+LOAD:0010FFC9                 add     ebx, 0FFFFFFh
+LOAD:0010FFCF                 and     ebx, 0FFFFFFh
+LOAD:0010FFD5                 mov     eax, [esi+ebx*4]
+LOAD:0010FFD8                 mov     ebx, eax
+LOAD:0010FFDA                 mov     eax, [esi+edi*4]
+LOAD:0010FFDD                 add     edi, 1
+LOAD:0010FFE3                 and     edi, 0FFFFFFh
+LOAD:0010FFE9                 cmp     eax, ebx
+LOAD:0010FFEB                 mov     eax, 0
+LOAD:0010FFF0                 setle   al
+LOAD:0010FFF3                 cmp     eax, 0
+LOAD:0010FFF9                 jnz     short loc_110000 ; jumptable 00101DFB case 700

@@ -1,0 +1,8 @@
+LOAD:0010B156                 mov     ebx, ebp        ; jumptable 00101DFB case 489
+LOAD:0010B158                 add     ebx, 0FFFFFFh
+LOAD:0010B15E                 and     ebx, 0FFFFFFh
+LOAD:0010B164                 mov     eax, [esi+ebx*4]
+LOAD:0010B167                 mov     ebx, eax
+LOAD:0010B169                 mov     eax, [esi+ebx*4]
+LOAD:0010B16C                 cmp     eax, 0
+LOAD:0010B172                 jnz     short loc_10B179 ; jumptable 00101DFB case 49

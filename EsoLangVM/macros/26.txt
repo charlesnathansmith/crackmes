@@ -1,0 +1,8 @@
+LOAD:00102341                 mov     ebx, ebp        ; jumptable 00101DFB case 26
+LOAD:00102343                 add     ebx, 0FFFFCCh
+LOAD:00102349                 and     ebx, 0FFFFFFh
+LOAD:0010234F                 mov     eax, [esi+ebx*4]
+LOAD:00102352                 mov     ebx, ebp
+LOAD:00102354                 add     ebx, 0FFFFFEh
+LOAD:0010235A                 and     ebx, 0FFFFFFh
+LOAD:00102360                 mov     [esi+ebx*4], eax

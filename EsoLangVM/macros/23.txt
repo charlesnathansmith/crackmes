@@ -1,0 +1,24 @@
+LOAD:001022CD                 mov     ebx, ebp        ; jumptable 00101DFB case 23
+LOAD:001022CF                 add     ebx, 3
+LOAD:001022D5                 and     ebx, 0FFFFFFh
+LOAD:001022DB                 mov     eax, [esi+ebx*4]
+LOAD:001022DE                 mov     edx, edi
+LOAD:001022E0                 add     edx, 0FFFFFFh
+LOAD:001022E6                 and     edx, 0FFFFFFh
+LOAD:001022EC                 mov     [esi+edx*4], eax
+LOAD:001022EF                 mov     edi, edx
+LOAD:001022F1                 mov     ebx, ebp
+LOAD:001022F3                 add     ebx, 0FFFFCCh
+LOAD:001022F9                 and     ebx, 0FFFFFFh
+LOAD:001022FF                 mov     eax, [esi+ebx*4]
+LOAD:00102302                 mov     ebx, eax
+LOAD:00102304                 mov     eax, [esi+edi*4]
+LOAD:00102307                 add     edi, 1
+LOAD:0010230D                 and     edi, 0FFFFFFh
+LOAD:00102313                 cmp     eax, ebx
+LOAD:00102315                 mov     eax, 0
+LOAD:0010231A                 setl    al
+LOAD:0010231D                 mov     ebx, eax
+LOAD:0010231F                 cmp     ebx, 0
+LOAD:00102325                 mov     ebx, 0
+LOAD:0010232A                 setnz   bl

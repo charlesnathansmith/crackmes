@@ -1,0 +1,14 @@
+LOAD:001026D0                 mov     ebx, ebp        ; jumptable 00101DFB case 34
+LOAD:001026D2                 add     ebx, 0FFFFCBh
+LOAD:001026D8                 and     ebx, 0FFFFFFh
+LOAD:001026DE                 mov     eax, [esi+ebx*4]
+LOAD:001026E1                 mov     ebx, eax
+LOAD:001026E3                 mov     edi, ebp
+LOAD:001026E5                 mov     eax, [esi+edi*4]
+LOAD:001026E8                 add     edi, 1
+LOAD:001026EE                 and     edi, 0FFFFFFh
+LOAD:001026F4                 mov     ebp, eax
+LOAD:001026F6                 mov     eax, [esi+edi*4]
+LOAD:001026F9                 add     edi, 1
+LOAD:001026FF                 and     edi, 0FFFFFFh
+LOAD:00102705                 jmp     jpt_101DFB[eax*4] ; switch 11935 cases

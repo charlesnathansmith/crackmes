@@ -1,5 +1,4 @@
 4d5a9000's EsoLangVM Test
-
 https://crackmes.one/crackme/644d347733c5d43938912cd7
 
 # Challenge
@@ -84,9 +83,7 @@ LOAD:001042F0                                         ; jumptable 00102705 case 
 Notice anything?
 Even though they can be reached from multiple different jumptables, each stub appears to be the same entry in every one of them.
 
-The stubs are actually all stored in the code base in numerical order, and there's likely some sort of pseudo-instruction set,
-directing execution from one stub to another to perform all the needed program logic.
-
+The stubs are actually all stored in the code base in numerical order, and execution flows from one stub to another based mostly on simple decisions made by each one.
 We'd really prefer not to have to characterize all of these, only the ones relevant to our goal of understanding the key validation.
 
 The plan is to generate a list of stub addresses by case number, and then to trace execution through parts of the program we care about
@@ -95,7 +92,7 @@ to see how the relevant ones get strung together.
 Then we can look at what each of those actually does, so we can "disassemble" the chain of stubs executed into something followable.
 
 If we skim through the docs for ELVM (https://github.com/shinh/elvm),
-our suspicions of a virtual instruction set seem to be confirmed:
+our suspicions of virtualization seem to be confirmed:
 
 ```
 6 registers: A, B, C, D, SP, and BP
@@ -107,17 +104,16 @@ We have hundreds of stub functions, though, and it would likely take a thorough 
 then how 8cc compiles that to bytecode to understand what's mapped to what from that side.
 
 We'll stick to understanding how the bytecode works and not worry about what any of it translates to in ELVM's language description.
-
 As a side note for now, skimming through the code a bit, we can see the output strings getting loaded a char at a time starting at 00100BCF.
 
-# Building the stub list
+# Building the macro list
 
 The "proper" way to go about doing this would probably be through a Python script loaded into IDA,
 but the subsystem for interacting with the debugger varies between IDA versions and it's all kind of finicky.
 
 I just saved a copy of the full disassembly listing (listing.txt).
 We can open it in Notepad++ and search for all instances of "jumptable 00101DFB case",
-since that table seems to have entries for all of the stubs:
+since that table seems to be the first xref to each stub and appears in its comments:
 
 ```
 	Line   606: LOAD:0010152A                 jmp     loc_111224      ; jumptable 00101DFB case 0
@@ -150,9 +146,9 @@ We're missing a few of them (eg. case 5), but these just seem to be jumps to oth
 We can go back and fill them in if they appear to become a problem.
 
 Now we just need to trace through execution and log when we're hitting each of these addresses during validation,
-work out what each one that gets used does, and then we can effectively decompile it into a sequence of macros.
+work out what each one that gets used does, and then we can effectively decompile it into a sequence of actions.
 
-# Execution tracing: Name
+# Macro sequence tracing: Name
 
 Let's see what happens after the Name gets read.
 
@@ -160,9 +156,11 @@ The general plan here is to launch the program, which will display the banner an
 Then we can attach with gdb, run a script to set silent breakpoints on all of our stubs that just log when they are hit, tell gdb to catch the write syscall,
 so we can focus just on what happens up until it asks for the Key, then we can see the chain of stubs used and work out what they do.
 
-Let's build a gdb command file to set all of our breakpoints.
-There are much more elegant ways to script this than what I did here, but I'm not that savvy with gdb scripting,
-and if I go down that route we're probably both just going to get confused.
+There are several ways to approach this.
+
+## Basic gdb scripting
+
+We could just build up a command script using python to log all of the macro entrypoints we hit:
 
 (gdbcmd.py)
 ```
@@ -186,8 +184,7 @@ with open("search.txt") as file:
             add_break(args[1], args[2])
 ```
 
-We can pipe the output to a file (gdb.cmd)
-
+We can pipe the output to a file like (gdb.cmd)
 We start up keygenme.elf, then switch to another shell and attach gdb.
 
 If you're on Ubuntu, you're going to have to edit /proc/sys/kernel/yama/ptrace_scope to contain 0 in order for attachment to work,
@@ -218,6 +215,7 @@ Breakpoint 4 at 0x10177a
 ```
 
 Make sure you don't use 'q' to quit out of the listing or you'll stop the script from setting all of the breakpoints.  Use 'c' or just hit return to step through it.
+You can use "set pagination off" at the beginning of your script if you want to auto-skip through this (just remember to turn it back on at the end if you like using it.)
 
 ```
 (gdb) set logging file name.txt
@@ -227,7 +225,7 @@ Copying output to name.txt.
 Copying debug output to name.txt.
 ```
 
-Go over to the shell that keygenme.elf is open in and type in "Alice" for the name and hit enter, then come back over to gdb and type 'c' to continue:
+Go over to the shell that keygenme.elf is open in, type in "Alice" for the name,  and hit enter, then come back over to gdb and type 'c' to continue:
 
 ```
 (gdb) c
@@ -247,14 +245,67 @@ $304 = "001042F0 133"
 Catchpoint 1 (call to syscall write), 0x00104334 in ?? ()
 ```
 
-Cool! We can already see a read char loop cycling around, so we've probably set things up correctly.
-(We broke in at 686, which does the read char syscall, and we can see it cycling around to it repeatedly.)
+Cool! We can already see a read loop cycling around, so we've probably set things up correctly.
+(We broke in at 686, which does the read syscall, and we can see it cycling around to it repeatedly.)
 
-If we separate out the different loops (nameloops.txt), then we can probably work out a more holistic understanding of each section.
+This way is going to get really clumsy really quickly when it comes to some things we want to do with gdb later.
+Thankfully gdb actually has its own python integration, but only for python scripts run within gdb.
+
+## Using the gdb python api
+
+The following python script does the same thing as our command script above,
+but gives us a much cleaner way to set breakpoints and more control over what happens when they are reached:
+
+(gdbpy.py)
+```
+import gdb
+import re
+
+# Breakpoint handler
+class macro_bp(gdb.Breakpoint):
+    def __init__(self, address, name):
+        self.address = address
+        self.name = name
+        gdb.Breakpoint.__init__(self, f"*0x{address}")
+        self.silent = True  # Don't announce when the breakpoint is hit
+        
+    def stop(self):
+        print(name)
+        return False        # Continue execution
+
+macros = []
+
+# Get initial pagination state and turn off pagination
+page_state = gdb.execute("show pagination", False, True).strip()[-4:-1].strip()
+gdb.execute("set pagination off", False)
+
+with open("search.txt") as file:
+    for line in file:
+        args = re.search("LOAD:([0-9A-F]{8}).* case ([0-9]*)$", line)
+        if args:
+            macros.append(macro_bp(args[1], args[2]))
+
+# Reset pagination to original state
+gdb.execute(f"set pagination {page_state}", False)
+```
+
+We run it using the source command just like with the command script:
+```
+(gdb) source gdbpy.py
+Breakpoint 2 at 0x10152f
+Breakpoint 3 at 0x101600
+Breakpoint 4 at 0x10177a
+```
+
+We get the same output in this particular use case, but you can see how it's a lot more flexible and offers more control.
+I planned to script gdb to get extract all of the information we need during execution tracing later,
+but it quickly became unwieldy and I had to go with a different solution.
+
+This seemed like good information worth leaving in, though.
 
 # Characterizing macros: Name
 
-If we find/replace the spaces in name.txt, and copy the whole thing into a spreadsheet to filter by unique macro numbers,
+If we find/replace the double quotes in (name.txt), and copy the whole thing into a spreadsheet to filter by unique macro numbers,
 we can see that there are 49 macros that get used to read and process the Name input (nameunique.txt)
 
 There are analysis tools available to help lift assembly to intermediate representations and try to simplify them,
@@ -264,16 +315,73 @@ The learning curve is a bit steep, and you still need an idea of what you're dea
 If we were trying to simplify complex stretches of code with lots of instructions that have side effects,
 then we would absolutely need to employ one of these frameworks to try to reduce it, but that doesn't appear to be what we're facing.
 
-Let's analyze a few macros manually and see if there are some patterns/idioms we can exploit to write our own simplifier.
+We can start working through some of the macros manually to look for any patterns we might be able to use to automate simplifying them.
 
-By doing this for the read loop (readloop.txt), we can see that 686 is effectively getchar(), and is just a simple syscall wrapper.
-Macro 688 is more representative of the type of code stubs we need to understand, and we do see a patterns that repeatedly reappears elsewhere.
+We can see that 686 is effectively getchar(), just a simple syscall wrapper.
+Macro 688 is more representative of the type of code stubs we need to understand, and we do see a pattern that repeatedly reappears elsewhere.
+See my manual breakdown in (688_manual.txt).  You'll notice I have split it into two sections, the data/math section and the conditional section.
 
-The overall structure for 688 is this:
-It receives some inputs:  esi is some global int table, edi and ebp are indices into it, and eax is the char read from stdin.
-Values are read from and written to the table relative to the indices, with some very basic math performed in between.
-It ultimately makes one decision, and any registers left changed at the end can be considered outputs
+The tedious data/math section follows a similar pattern in every macro.
+It's made up of very simple reads and writes from a table pointed to by esi and some basic math,
+and it only uses a handful of instructions with no side effects.
 
-Can we write our own junky symbolic execution engine that will simplify these limited cases?
-This is explorered in the accompanying symbolic.txt, and omitted here for brevity.
+Can we write our own junky lifting engine that will simplify these limited cases?
+This is explorered in the accompanying (lifting.md) and (lifting.py)
+
+Using (lifting.py) on macro 688, we can successfully print the same annotations we came up with manually,
+as well as produce a simplified version of the code along with all the relevant inputs and outputs (registers left tainted.)
+
+esi() in the reduced format refers to indexing a uint32_t from an array of them that starts at esi.
+Parentheses were chosen over brackets [] to avoid confusing the indexes with memory addresses.
+Ie. 'esi(index)' is equivalent to '[esi+index*4]'
+
+```
+$ python3 lifting.py macros/688.txt
+
+Inputs:
+in(edi): edi
+in(eax): eax
+in(ebp): ebp
+...
+Reduced:
+esi(in(edi) - 1) = in(eax)
+esi(in(edi) - 2) = in(ebp) + 2
+esi(in(edi) - 3) = esi(in(ebp) + 2)
+esi(in(edi) - 4) = esi(in(ebp) - 1)
+esi(in(ebp) - 1) = esi(in(ebp) - 1) + 1
+esi(esi(in(ebp) + 2) + esi(in(ebp) - 1)) = in(eax)
+esi(in(edi) - 1) = in(eax)
+
+Outputs:
+out(edx): in(edi) - 1
+out(edi): in(edi)
+out(ebx): 10
+out(eax): in(eax)
+out(ecx): esi(in(ebp) + 2) + esi(in(ebp) - 1)
+
+Unprocessed:
+LOAD:0010FC16                 cmp     eax, ebx
+LOAD:0010FC18                 mov     eax, 0
+LOAD:0010FC1D                 setnz   al
+LOAD:0010FC20                 mov     ebx, eax
+LOAD:0010FC22                 cmp     ebx, 0
+LOAD:0010FC28                 mov     ebx, 0
+LOAD:0010FC2D                 setnz   bl
+```
+
+All of the math and memory operations are worked out for us, and we can just focus on the conditional at the end.
+Here the conditional just checks for a newline character.
+
+We can already start to string together macros and get some idea of what's going on through static analysis.
+That doesn't give us a very complete picture though, since many pre-existing important values are read from the table.
+
+It would be nice to have an execution trace that gives us the macros in their reduced forms,
+along with the relevant variable values at each step.
+
+# Simplified execution tracing: Name
+
+I originally tried to use a python script to setup tons of breakpoints that could print the information we need as they are reached,
+but it was a messy solution and would require re-tracing the program anytime we need to adjust the outputs.
+
+The most sensible solution (given my experience, at least) was to just write a Pin tool to trace through and extract everything we care about.
 
