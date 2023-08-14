@@ -6,5 +6,5 @@ Edges are labeled with how many times they are traversed during execution
 ```
 $ sudo apt install graphviz
 $ python3 macros.txt > macros.dot
-$ dot -tSvg macros.dot > macros.svg
+$ dot -Tsvg macros.dot > macros.svg
 ```
