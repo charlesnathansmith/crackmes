@@ -942,6 +942,11 @@ $ xxd -s 0x100 -l 6 -g 1 floppy2.img
 00000100: ea 00 00 00 08 0a
 ```
 
+We can test this out:
+```
+$ qemu-system-x86_64 -drive format=raw,file=floppy2.img
+```
+
 And we get a cool reward screen:
 
 ![flag](images/flag.png)
