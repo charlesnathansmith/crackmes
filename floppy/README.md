@@ -111,7 +111,7 @@ which is where the MBR gets loaded at boot time.
               
 The entire MBR gets executed from the beginning.
 
-We can go to address 7c00 and choose Disassemble from the context menu to see the initial jump past the volume information:
+We can go to address 7c00 and choose Disassemble from the context menu (or press D) to see the initial jump past the volume information:
 ```
 0000:7c00 e9 3b 00        JMP        LAB_0000_7c3e
 
