@@ -448,7 +448,7 @@ Let's look at what needs to happen to pass the verification:
 0000:7df2 c7              undefined1 C7h
 ```
 
-LODSB is equivalent to AL = DS:SI; SI = SI - 1 (decrements since STD set direction flag)
+LODSB is equivalent to AL = DS:SI; SI = SI - 1 (decrements since STD set direction flag.)  
 LOOP decrements CX and jumps back up to this point
 
 For us here, it starts with AL = byte ptr [0x7df2], then moves downward each loop iteration (to AL = byte ptr [0x7df1], etc)
