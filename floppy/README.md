@@ -345,7 +345,7 @@ Read Sectors sets the carry flag when there's an error, so this seems to have wo
 0x8e818: 0x11  0x20  0x01  0x13  0x40  0x01  0x15  0x60
 ```
 
-This looks like the start of a File Allocation Table it offset 0x200 in floppy.img, so this all seems reasonable.
+This looks like the start of a File Allocation Table at offset 0x200 in floppy.img, so this all seems reasonable.
 
 We need to figure out what's actually triggering the error message.
 
