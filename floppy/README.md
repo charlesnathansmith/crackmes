@@ -73,7 +73,7 @@ gpg: aead encrypted packet with unknown version 143
 gpg: uncompressing failed: Unknown compression algorithm
 ```
 
-![Doubt](images/doubt.png)
+![doubt](images/doubt.png)
 
 We could check for other partitions maybe:
 ```
@@ -944,7 +944,7 @@ $ xxd -s 0x100 -l 6 -g 1 floppy2.img
 
 And we get a cool reward screen:
 
-![Doubt](images/flag.png)
+![flag](images/flag.png)
 
 Which has our flag:
 ```
