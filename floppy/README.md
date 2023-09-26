@@ -1,4 +1,4 @@
-2bitsin's Secret message from a traveller  
+Walk-through for solving 2bitsin's Secret message from a traveller  
 https://crackmes.one/crackme/650c14b528b5870bef26308d
 
 # Files included
