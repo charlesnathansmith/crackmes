@@ -614,7 +614,7 @@ Here the LODSD SI instruction is utilizing the direction flag to alternate betwe
 It's clever, and also something the decompilation is completely oblivious to.
 
 Entering FUN_0000_7db8, the direction flag is cleared, and EBX = EDX = sum.
-DI = 0, ES = 0xe404, DS = 0x800, and SI = 0 or 8, set back before this code is reached and never updated.
+DI = 0, ES = 0xe404, DS = 0x800, and SI = 0 or 8, set back before this code is reached and never updated in here.
 
 Let's go through it manually:
 ```
