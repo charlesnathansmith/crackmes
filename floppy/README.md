@@ -7,7 +7,7 @@ README.md               this full walk-through
 
 floppy.img              original challenge file
 mbr.bin                 extracted master boot record
-mbr.bin.txt				Ghidra disassembly of master boot record
+mbr.bin.txt             Ghidra disassembly of master boot record
 secureos.bin            extracted file from floppy file system
 
 target.xml              some gdb scripts to help with real mode
