@@ -94,7 +94,7 @@ floppy.img4      1329943125 2643367079 1313423955 626.3G c7 Syrinx
 Partition table entries are not in disk order.
 ```
 
-And this is nonsense.
+And this is nonsense, but I don't use fdisk that often and probably did something wrong here.
 
 We can grab the MBR:
 ```
