@@ -874,7 +874,7 @@ $ ./xteadec secureos.bin decrypted.bin 2f36322f 3a523838 1d384645 4080362a
 
 Note that the key values are in little-endian format.
 
-Trying to decrypt using the 0x14040 data as a key gives us garbage, but using the 0x24040 and examining it gives us something that actually has readable strings in it.
+Trying to decrypt using the 0x14040 data as a key gives us garbage, but using the key at 0x24040 and examining the result gives us something that actually has readable strings and repetitive patterns in it.
 
 We can open decrypted.bin in Ghidra again using x86:LE:16:Real Mode as the language, this time with the base address at 0800:0000.
 
