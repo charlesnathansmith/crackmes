@@ -788,7 +788,7 @@ This is controlled by this outer loop:
 0000:7d20 72 ec           JC         LAB_0000_7d0e
 ```
 
-Where FUN_0000_7d93 is the main decryption function we've looking that decrypts two dwords (8 bytes total.)
+Where FUN_0000_7d93 is the main decryption function we've been looking at that decrypts two dwords (8 bytes total.)
 
 At the start of this loop, DS = 0x800, so the first 8 bytes at 0x8000 get decrypted, then the next 8 at 0x8008.
 DS is then incremented to 0x801, or 0x8010, which is sensible since that's the next 8-byte block.
