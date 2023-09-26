@@ -858,7 +858,7 @@ https://www.mediafire.com/file/hjuapu9z7plnoja/IBM_PS1_2121_-_ROM_%2528US%2529.z
 Which I unfortunately can't include with the write-up because it's copyrighted.
 
 An attempt was made to just run our target with IBMulator utilizing the discovered ROM, since that's apparently the kind of thing the program is specifically designed for, 
-but the software doesn't seem to do anything whatsoever on either linux of Windows except play drive noise audio.
+but the software doesn't seem to do anything whatsoever on either linux of Windows except play drive noise audio and display a fake desktop with unclickable buttons.
 
 If we extract and open FC0000.BIN in a hex editor, we can search for '92f9674' and get 3 hits 
 at offsets 0xC, 0x20000, and 0x30000.
