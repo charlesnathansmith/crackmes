@@ -941,8 +941,8 @@ $ dd if=mbr_patch of=floppy2.img obs=1 seek=256 conv=notrunc
 0+1 records in
 6+0 records out
 6 bytes copied, 0.00220758 s, 2.7 kB/s
-$ xxd -s 0x100 -l 6 -g 1 floppy2.img  
-00000100: ea 00 00 00 08 0a
+$ xxd -s 0x100 -l 5 -g 1 floppy2.img  
+00000100: ea 00 00 00 08
 ```
 
 We can test this out:
