@@ -936,11 +936,11 @@ We can just patch this with a far jump to 0x8000 and should be good to go:
 
 We can do this with:
 ```
-$ echo -e "\xea\x00\x00\x00\x08" > mbr_patch
+$ echo -n -e "\xea\x00\x00\x00\x08" > mbr_patch
 $ dd if=mbr_patch of=floppy2.img obs=1 seek=256 conv=notrunc
 0+1 records in
-6+0 records out
-6 bytes copied, 0.00220758 s, 2.7 kB/s
+5+0 records out
+5 bytes copied, 0.00220758 s, 2.7 kB/s
 $ xxd -s 0x100 -l 5 -g 1 floppy2.img  
 00000100: ea 00 00 00 08
 ```
