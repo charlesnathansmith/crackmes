@@ -623,19 +623,19 @@ Let's go through it manually:
 
 0000:7dbc 66 83 e3 03     AND        EBX,0x3					; EBX = (sum>>11) & 3
 0000:7dc0 66 c1 e3 02     SHL        EBX,0x2					; EBX = ((sum>>11) & 3) << 2
-0000:7dc4 26 66 8b 19     MOV        EBX,dword ptr ES:[BX + DI]	; EBX = 0xe404:[(((sum>>11) & 3) << 2)] ; should be a key value
+0000:7dc4 26 66 8b 19     MOV        EBX,dword ptr ES:[BX + DI]	                ; EBX = 0xe404:[(((sum>>11) & 3) << 2)] ; should be a key value
 0000:7dc8 66 01 d3        ADD        EBX,EDX					; EBX += sum
 0000:7dcb 66 53           PUSH       EBX
-0000:7dcd 66 8b 04        MOV        EAX,dword ptr [SI]			; EAX = v0
+0000:7dcd 66 8b 04        MOV        EAX,dword ptr [SI]			        ; EAX = v0
 0000:7dd0 66 89 c3        MOV        EBX,EAX					; EBX = EAX = v0
 0000:7dd3 66 c1 e0 04     SHL        EAX,0x4					; EAX = v0 << 4
 0000:7dd7 66 c1 eb 05     SHR        EBX,0x5					; EBX = v0 >> 5
 0000:7ddb 66 31 c3        XOR        EBX,EAX					; EBX = (v0 >> 5) ^ (v0 << 4)
-0000:7dde 66 ad           LODSD      SI							; EAX = dword ptr DS:[SI] = [0x8000 + SI] = v0, SI += 1
+0000:7dde 66 ad           LODSD      SI						; EAX = dword ptr DS:[SI] = [0x8000 + SI] = v0, SI += 1
 0000:7de0 66 01 d8        ADD        EAX,EBX					; EAX = v0 + ((v0 >> 5) ^ (v0 << 4))
-0000:7de3 66 5b           POP        EBX						; EBX = sum + 0xe404:[(((sum>>11) & 3) << 2)]
+0000:7de3 66 5b           POP        EBX				        ; EBX = sum + 0xe404:[(((sum>>11) & 3) << 2)]
 0000:7de5 66 31 d8        XOR        EAX,EBX					; EAX = (v0 + ((v0 >> 5) ^ (v0 << 4))) ^ (sum + 0xe404:[(((sum>>11) & 3) << 2)])
-0000:7de8 66 29 04        SUB        dword ptr [SI],EAX			; v1 -= (v0 + ((v0 >> 5) ^ (v0 << 4))) ^ (sum + 0xe404:[(((sum>>11) & 3) << 2)])
+0000:7de8 66 29 04        SUB        dword ptr [SI],EAX			        ; v1 -= (v0 + ((v0 >> 5) ^ (v0 << 4))) ^ (sum + 0xe404:[(((sum>>11) & 3) << 2)])
 0000:7deb c3              RET
 ```
 
