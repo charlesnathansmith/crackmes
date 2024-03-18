@@ -169,7 +169,7 @@ BINARY_PATH = './patched.exe'
 p = angr.Project(BINARY_PATH)
 
 # Setup the entry state and stack frame
-s = p.factory.full_init_state(addr=0x1400013B1)
+s = p.factory.full_init_state(addr=0x1400013B1)  # start after return from vfscanf stub
 s.regs.rbp = s.regs.rsp
 s.regs.rsp = s.regs.rsp - 0x70
 
