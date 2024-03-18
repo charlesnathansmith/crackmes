@@ -7,7 +7,7 @@ BINARY_PATH = './patched.exe'
 p = angr.Project(BINARY_PATH)
 
 # Setup the entry state and stack frame
-s = p.factory.full_init_state(addr=0x1400013B1)
+s = p.factory.full_init_state(addr=0x1400013B1)  # start after return from vfscanf stub
 s.regs.rbp = s.regs.rsp
 s.regs.rsp = s.regs.rsp - 0x70
 
@@ -22,7 +22,7 @@ for c in password.chop(8):
 
 print("Solving...")
 
-# Create the simulation manager and add constraints
+# Create the simulation manager
 simgr = p.factory.simgr(s)
 
 # Explore for solutions
