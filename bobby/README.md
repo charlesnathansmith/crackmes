@@ -182,7 +182,7 @@ for c in password.chop(8):
     s.add_constraints(c >= '\x21') # '!'
     s.add_constraints(c <= '\x7e') # '~'
 
-# Create the simulation manager and add constraints
+# Create the simulation manager
 simgr = p.factory.simgr(s)
 
 # Explore for solutions
